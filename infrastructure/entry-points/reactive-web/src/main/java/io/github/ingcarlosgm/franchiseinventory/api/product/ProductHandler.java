@@ -2,6 +2,7 @@ package io.github.ingcarlosgm.franchiseinventory.api.product;
 
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
+import io.github.ingcarlosgm.franchiseinventory.usecase.updateproductstock.UpdateProductStockUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ public class ProductHandler {
 
     private final AddProductUseCase addProductUseCase;
     private final RemoveProductUseCase removeProductUseCase;
+    private final UpdateProductStockUseCase updateProductStockUseCase;
 
     public Mono<ServerResponse> addProduct(ServerRequest request) {
         String branchId = request.pathVariable("branchId");
@@ -46,5 +48,23 @@ public class ProductHandler {
                         log.warn("Fallo al eliminar el producto {}: {}",
                                 productId, error.getMessage()))
                 .then(ServerResponse.noContent().build());
+    }
+
+    public Mono<ServerResponse> updateProductStock(ServerRequest request) {
+        String productId = request.pathVariable("productId");
+
+        return request.bodyToMono(UpdateProductRequest.class)
+                .flatMap(body -> updateProductStockUseCase
+                        .updateProductStock(productId, body.getStock()))
+                .doOnSuccess(product ->
+                        log.info("Stock actualizado a {} para el producto {}",
+                                product.getStock(), productId))
+                .doOnError(error ->
+                        log.warn("Fallo al actualizar el stock del producto {}: {}",
+                                productId, error.getMessage()))
+                .map(ProductApiMapper::toResponse)
+                .flatMap(response -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(response));
     }
 }

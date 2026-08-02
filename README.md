@@ -123,6 +123,25 @@ Sin body.
 Eliminar un producto inexistente devuelve `404` en lugar de `204`: informa al
 cliente de que no había nada que borrar.
 
+### Modificar el stock de un producto
+
+`PATCH /products/{productId}`
+
+```json
+{ "stock": 42 }
+```
+
+**Respuestas**
+
+| Código | Cuándo |
+|---|---|
+| `200` | Stock actualizado; devuelve el producto completo |
+| `400` | El stock es nulo o negativo |
+| `404` | El producto indicado no existe |
+
+El valor recibido **reemplaza** el stock, no lo incrementa. La operación es
+idempotente: aplicar la misma petición dos veces deja el mismo estado.
+
 ## Modelo de datos
 
 ### `franchise`

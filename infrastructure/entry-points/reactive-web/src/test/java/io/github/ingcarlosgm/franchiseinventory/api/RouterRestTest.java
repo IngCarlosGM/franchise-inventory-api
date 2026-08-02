@@ -13,6 +13,7 @@ import io.github.ingcarlosgm.franchiseinventory.api.product.ProductHandler;
 import io.github.ingcarlosgm.franchiseinventory.model.product.Product;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
+import io.github.ingcarlosgm.franchiseinventory.usecase.updateproductstock.UpdateProductStockUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
@@ -51,6 +52,9 @@ class RouterRestTest {
 
     @MockitoBean
     private RemoveProductUseCase removeProductUseCase;
+
+    @MockitoBean
+    private UpdateProductStockUseCase updateProductStockUseCase;
 
     @Test
     void shouldCreateFranchise() {
@@ -190,6 +194,44 @@ class RouterRestTest {
 
         webTestClient.delete()
                 .uri("/products/{productId}", PRODUCT_ID)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.error").isEqualTo("RESOURCE_NOT_FOUND");
+    }
+
+    @Test
+    void shouldUpdateProductStock() {
+        Product updated = Product.builder()
+                .id(PRODUCT_ID)
+                .branchId(BRANCH_ID)
+                .name("Café")
+                .stock(42)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(updateProductStockUseCase.updateProductStock(PRODUCT_ID, 42))
+                .thenReturn(Mono.just(updated));
+
+        webTestClient.patch()
+                .uri("/products/{productId}", PRODUCT_ID)
+                .bodyValue(Map.of("stock", 42))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(PRODUCT_ID)
+                .jsonPath("$.stock").isEqualTo(42);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUpdatingAProductThatDoesNotExist() {
+        when(updateProductStockUseCase.updateProductStock(PRODUCT_ID, 42))
+                .thenReturn(Mono.error(new ResourceNotFoundException("el producto", PRODUCT_ID)));
+
+        webTestClient.patch()
+                .uri("/products/{productId}", PRODUCT_ID)
+                .bodyValue(Map.of("stock", 42))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
