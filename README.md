@@ -86,6 +86,27 @@ Campos opcionales: `city`, `phone`.
 La unicidad del nombre está acotada a la franquicia: dos franquicias distintas
 pueden tener una sucursal llamada "Centro".
 
+### Agregar producto a una sucursal
+
+`POST /branches/{branchId}/products`
+
+```json
+{ "name": "Café", "stock": 40 }
+```
+
+Campos opcionales: `price`, `unit`.
+
+**Respuestas**
+
+| Código | Cuándo                                                                     |
+|---|----------------------------------------------------------------------------|
+| `201` | Producto creado; devuelve el producto con su identificador                 |
+| `400` | El nombre está vacío, el stock es nulo o negativo, o el precio es negativo |
+| `404` | La sucursal indicada no existe                                             |
+| `409` | Ya existe un producto con ese nombre en esa sucursal                       |
+
+Un stock de cero es válido: significa agotado. La unicidad del nombre está acotada a la sucursal.
+
 ## Modelo de datos
 
 ### `franchise`
@@ -108,6 +129,19 @@ pueden tener una sucursal llamada "Centro".
 | `name` | `VARCHAR(120)` | Obligatorio, único dentro de la franquicia |
 | `city` | `VARCHAR(80)` | Opcional |
 | `phone` | `VARCHAR(20)` | Opcional |
+| `created_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
+| `updated_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
+
+### `product`
+
+| Columna | Tipo | Restricción |
+|---|---|---|
+| `id` | `VARCHAR(36)` | Clave primaria, UUID asignado por la aplicación |
+| `branch_id` | `VARCHAR(36)` | Obligatorio, llave foránea a `branch` con borrado en cascada |
+| `name` | `VARCHAR(120)` | Obligatorio, único dentro de la sucursal |
+| `stock` | `INTEGER` | Obligatorio, no negativo |
+| `price` | `NUMERIC(12,2)` | Opcional, no negativo |
+| `unit` | `VARCHAR(20)` | Opcional |
 | `created_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
 | `updated_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
 

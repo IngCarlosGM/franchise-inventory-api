@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 public interface BranchRepository {
     Mono<Branch> create(Branch branch);
     Mono<Boolean> existsByFranchiseIdAndName(String franchiseId, String name);
+    Mono<Branch> findById(String id);
 }
