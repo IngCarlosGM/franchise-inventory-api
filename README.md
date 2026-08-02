@@ -64,6 +64,28 @@ Campos opcionales: `contactEmail`, `website`.
 | `400` | El nombre está vacío o el cuerpo es inválido        |
 | `409` | Ya existe una franquicia con ese nombre             |
 
+### Agregar sucursal a una franquicia
+
+`POST /franchises/{franchiseId}/branches`
+
+```json
+{ "name": "Centro" }
+```
+
+Campos opcionales: `city`, `phone`.
+
+**Respuestas**
+
+| Código | Cuándo |
+|---|---|
+| `201` | Sucursal creada; devuelve el recurso con su identificador |
+| `400` | El nombre está vacío o el cuerpo es inválido |
+| `404` | La franquicia indicada no existe |
+| `409` | Ya existe una sucursal con ese nombre en esa franquicia |
+
+La unicidad del nombre está acotada a la franquicia: dos franquicias distintas
+pueden tener una sucursal llamada "Centro".
+
 ## Modelo de datos
 
 ### `franchise`
@@ -74,6 +96,18 @@ Campos opcionales: `contactEmail`, `website`.
 | `name` | `VARCHAR(120)` | Obligatorio, único |
 | `contact_email` | `VARCHAR(120)` | Opcional |
 | `website` | `VARCHAR(200)` | Opcional |
+| `created_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
+| `updated_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
+
+### `branch`
+
+| Columna | Tipo | Restricción |
+|---|---|---|
+| `id` | `VARCHAR(36)` | Clave primaria, UUID asignado por la aplicación |
+| `franchise_id` | `VARCHAR(36)` | Obligatorio, llave foránea a `franchise` con borrado en cascada |
+| `name` | `VARCHAR(120)` | Obligatorio, único dentro de la franquicia |
+| `city` | `VARCHAR(80)` | Opcional |
+| `phone` | `VARCHAR(20)` | Opcional |
 | `created_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
 | `updated_at` | `TIMESTAMPTZ` | Obligatorio, asignado por el adaptador |
 

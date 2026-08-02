@@ -31,4 +31,9 @@ public class FranchiseAdapter implements FranchiseRepository {
     public Mono<Boolean> existsByName(String name) {
         return repository.existsByName(name);
     }
+
+    @Override
+    public Mono<Franchise> findById(String id) {
+        return repository.findById(id).map(FranchiseMapper::toDomain);
+    }
 }
