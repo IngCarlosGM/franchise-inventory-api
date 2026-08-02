@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Import;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
+import io.github.ingcarlosgm.franchiseinventory.model.branch.gateways.BranchRepository;
+import io.github.ingcarlosgm.franchiseinventory.usecase.addbranch.AddBranchUseCase;
 
 class UseCasesConfigTest {
 
@@ -20,6 +22,8 @@ class UseCasesConfigTest {
                      new AnnotationConfigApplicationContext(TestConfig.class)) {
 
             assertNotNull(context.getBean(CreateFranchiseUseCase.class));
+            assertNotNull(context.getBean(CreateFranchiseUseCase.class));
+            assertNotNull(context.getBean(AddBranchUseCase.class));
         }
     }
 
@@ -35,6 +39,11 @@ class UseCasesConfigTest {
         @Bean
         public IdentityGenerator identityGenerator() {
             return mock(IdentityGenerator.class);
+        }
+
+        @Bean
+        public BranchRepository branchRepository() {
+            return mock(BranchRepository.class);
         }
     }
 }

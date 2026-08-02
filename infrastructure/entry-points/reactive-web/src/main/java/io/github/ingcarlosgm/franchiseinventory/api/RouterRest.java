@@ -1,5 +1,6 @@
 package io.github.ingcarlosgm.franchiseinventory.api;
 
+import io.github.ingcarlosgm.franchiseinventory.api.branch.BranchHandler;
 import io.github.ingcarlosgm.franchiseinventory.api.franchise.FranchiseHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouterRest {
 
     @Bean
-    public RouterFunction<ServerResponse> routerFunction(FranchiseHandler franchiseHandler) {
-        return route(POST("/franchises"), franchiseHandler::createFranchise);
+    public RouterFunction<ServerResponse> routerFunction(FranchiseHandler franchiseHandler,
+                                                         BranchHandler branchHandler) {
+        return route(POST("/franchises"), franchiseHandler::createFranchise)
+                .andRoute(POST("/franchises/{franchiseId}/branches"), branchHandler::addBranch);
     }
 }
