@@ -12,6 +12,7 @@ import io.github.ingcarlosgm.franchiseinventory.usecase.createfranchise.CreateFr
 import io.github.ingcarlosgm.franchiseinventory.api.product.ProductHandler;
 import io.github.ingcarlosgm.franchiseinventory.model.product.Product;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
+import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
@@ -47,6 +48,9 @@ class RouterRestTest {
 
     @MockitoBean
     private AddProductUseCase addProductUseCase;
+
+    @MockitoBean
+    private RemoveProductUseCase removeProductUseCase;
 
     @Test
     void shouldCreateFranchise() {
@@ -166,5 +170,29 @@ class RouterRestTest {
                 .expectBody()
                 .jsonPath("$.error").isEqualTo("INVALID_DATA")
                 .jsonPath("$.errors[0].field").isEqualTo("stock");
+    }
+
+    @Test
+    void shouldRemoveProduct() {
+        when(removeProductUseCase.removeProduct(PRODUCT_ID)).thenReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/products/{productId}", PRODUCT_ID)
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody().isEmpty();
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenRemovingAProductThatDoesNotExist() {
+        when(removeProductUseCase.removeProduct(PRODUCT_ID))
+                .thenReturn(Mono.error(new ResourceNotFoundException("el producto", PRODUCT_ID)));
+
+        webTestClient.delete()
+                .uri("/products/{productId}", PRODUCT_ID)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.error").isEqualTo("RESOURCE_NOT_FOUND");
     }
 }

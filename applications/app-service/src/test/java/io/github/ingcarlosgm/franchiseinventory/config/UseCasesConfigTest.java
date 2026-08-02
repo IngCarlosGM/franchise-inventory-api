@@ -15,6 +15,7 @@ import io.github.ingcarlosgm.franchiseinventory.model.branch.gateways.BranchRepo
 import io.github.ingcarlosgm.franchiseinventory.usecase.addbranch.AddBranchUseCase;
 import io.github.ingcarlosgm.franchiseinventory.model.product.gateways.ProductRepository;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
+import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
 
 class UseCasesConfigTest {
 
@@ -27,6 +28,7 @@ class UseCasesConfigTest {
             assertNotNull(context.getBean(CreateFranchiseUseCase.class));
             assertNotNull(context.getBean(AddBranchUseCase.class));
             assertNotNull(context.getBean(AddProductUseCase.class));
+            assertNotNull(context.getBean(RemoveProductUseCase.class));
         }
     }
 

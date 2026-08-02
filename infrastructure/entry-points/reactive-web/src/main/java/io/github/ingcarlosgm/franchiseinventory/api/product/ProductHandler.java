@@ -1,6 +1,7 @@
 package io.github.ingcarlosgm.franchiseinventory.api.product;
 
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
+import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class ProductHandler {
 
     private final AddProductUseCase addProductUseCase;
+    private final RemoveProductUseCase removeProductUseCase;
 
     public Mono<ServerResponse> addProduct(ServerRequest request) {
         String branchId = request.pathVariable("branchId");
@@ -33,5 +35,16 @@ public class ProductHandler {
                 .flatMap(response -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(response));
+    }
+
+    public Mono<ServerResponse> removeProduct(ServerRequest request) {
+        String productId = request.pathVariable("productId");
+
+        return removeProductUseCase.removeProduct(productId)
+                .doOnSuccess(unused -> log.info("Producto eliminado con id {}", productId))
+                .doOnError(error ->
+                        log.warn("Fallo al eliminar el producto {}: {}",
+                                productId, error.getMessage()))
+                .then(ServerResponse.noContent().build());
     }
 }
