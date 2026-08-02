@@ -8,7 +8,7 @@ public class DuplicateNameException extends RuntimeException {
     private final String scope;
 
     public DuplicateNameException(String name, String scope) {
-        super("name %s ya existe en %s".formatted(name, scope));
+        super("El nombre %s ya está en uso en %s".formatted(name, scope));
         this.name = name;
         this.scope = scope;
     }
