@@ -67,17 +67,46 @@ jacoco {
     reportsDirectory.set(layout.buildDirectory.dir("reports"))
 }
 
+def coverageExclusions = [
+        '**/*Entity*',
+        '**/*Mapper*',
+        '**/config/**',
+        '**/MainApplication*'
+]
+
 tasks.register('jacocoMergedReport', JacocoReport) {
     dependsOn = [test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories.setFrom files(subprojects.sourceSets.main.output)
+    classDirectories.setFrom files(subprojects.sourceSets.main.output.classesDirs.files.flatten().collect {
+        fileTree(dir: it, exclude: coverageExclusions)
+    })
     executionData.setFrom project.fileTree(dir: '.', include: '**/build/jacoco/test.exec')
     reports {
         xml.setRequired true
         csv.setRequired false
         html.setRequired true
     }
+}
+
+tasks.register('jacocoMergedCoverageVerification', JacocoCoverageVerification) {
+    dependsOn 'jacocoMergedReport'
+    sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.setFrom files(subprojects.sourceSets.main.output.classesDirs.files.flatten().collect {
+        fileTree(dir: it, exclude: coverageExclusions)
+    })
+    executionData.setFrom project.fileTree(dir: '.', include: '**/build/jacoco/test.exec')
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.60
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'jacocoMergedCoverageVerification'
 }
 
 tasks.withType(JavaCompile).configureEach {
