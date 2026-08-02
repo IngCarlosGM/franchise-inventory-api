@@ -9,6 +9,9 @@ import io.github.ingcarlosgm.franchiseinventory.model.exception.ResourceNotFound
 import io.github.ingcarlosgm.franchiseinventory.model.franchise.Franchise;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addbranch.AddBranchUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.createfranchise.CreateFranchiseUseCase;
+import io.github.ingcarlosgm.franchiseinventory.api.product.ProductHandler;
+import io.github.ingcarlosgm.franchiseinventory.model.product.Product;
+import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
@@ -24,13 +27,14 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {RouterRest.class, FranchiseHandler.class, BranchHandler.class})
+@ContextConfiguration(classes = {RouterRest.class, FranchiseHandler.class, BranchHandler.class, ProductHandler.class})
 @WebFluxTest
 @Import(GlobalErrorHandler.class)
 class RouterRestTest {
 
     private static final String FRANCHISE_ID = "11111111-1111-1111-1111-111111111111";
     private static final String BRANCH_ID = "22222222-2222-2222-2222-222222222222";
+    private static final String PRODUCT_ID = "33333333-3333-3333-3333-333333333333";
 
     @Autowired
     private WebTestClient webTestClient;
@@ -40,6 +44,9 @@ class RouterRestTest {
 
     @MockitoBean
     private AddBranchUseCase addBranchUseCase;
+
+    @MockitoBean
+    private AddProductUseCase addProductUseCase;
 
     @Test
     void shouldCreateFranchise() {
@@ -123,5 +130,41 @@ class RouterRestTest {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.error").isEqualTo("RESOURCE_NOT_FOUND");
+    }
+
+    @Test
+    void shouldAddProduct() {
+        Product created = Product.builder()
+                .id(PRODUCT_ID)
+                .branchId(BRANCH_ID)
+                .name("Café")
+                .stock(40)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+        when(addProductUseCase.addProduct(any(Product.class))).thenReturn(Mono.just(created));
+
+        webTestClient.post()
+                .uri("/branches/{branchId}/products", BRANCH_ID)
+                .bodyValue(Map.of("name", "Café", "stock", 40))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(PRODUCT_ID)
+                .jsonPath("$.branchId").isEqualTo(BRANCH_ID)
+                .jsonPath("$.stock").isEqualTo(40);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenStockIsNegative() {
+        webTestClient.post()
+                .uri("/branches/{branchId}/products", BRANCH_ID)
+                .bodyValue(Map.of("name", "Café", "stock", -1))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.error").isEqualTo("INVALID_DATA")
+                .jsonPath("$.errors[0].field").isEqualTo("stock");
     }
 }

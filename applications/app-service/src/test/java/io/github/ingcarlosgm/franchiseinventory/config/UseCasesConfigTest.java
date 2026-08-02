@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import io.github.ingcarlosgm.franchiseinventory.model.branch.gateways.BranchRepository;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addbranch.AddBranchUseCase;
+import io.github.ingcarlosgm.franchiseinventory.model.product.gateways.ProductRepository;
+import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
 
 class UseCasesConfigTest {
 
@@ -24,6 +26,7 @@ class UseCasesConfigTest {
             assertNotNull(context.getBean(CreateFranchiseUseCase.class));
             assertNotNull(context.getBean(CreateFranchiseUseCase.class));
             assertNotNull(context.getBean(AddBranchUseCase.class));
+            assertNotNull(context.getBean(AddProductUseCase.class));
         }
     }
 
@@ -45,5 +48,8 @@ class UseCasesConfigTest {
         public BranchRepository branchRepository() {
             return mock(BranchRepository.class);
         }
+
+        @Bean
+        public ProductRepository productRepository() { return mock(ProductRepository.class); }
     }
 }

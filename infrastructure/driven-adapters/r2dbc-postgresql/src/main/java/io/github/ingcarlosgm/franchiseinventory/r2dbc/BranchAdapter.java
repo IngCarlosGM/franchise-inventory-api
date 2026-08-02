@@ -31,4 +31,9 @@ public class BranchAdapter implements BranchRepository {
     public Mono<Boolean> existsByFranchiseIdAndName(String franchiseId, String name) {
         return repository.existsByFranchiseIdAndName(franchiseId, name);
     }
+
+    @Override
+    public Mono<Branch> findById(String id) {
+        return repository.findById(id).map(BranchMapper::toDomain);
+    }
 }
