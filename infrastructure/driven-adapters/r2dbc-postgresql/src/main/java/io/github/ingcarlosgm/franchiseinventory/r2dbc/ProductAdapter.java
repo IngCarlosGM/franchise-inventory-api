@@ -31,4 +31,14 @@ public class ProductAdapter implements ProductRepository {
     public Mono<Boolean> existsByBranchIdAndName(String branchId, String name) {
         return repository.existsByBranchIdAndName(branchId, name);
     }
+
+    @Override
+    public Mono<Product> findById(String id) {
+        return repository.findById(id).map(ProductMapper::toDomain);
+    }
+
+    @Override
+    public Mono<Void> deleteById(String id) {
+        return repository.deleteById(id);
+    }
 }

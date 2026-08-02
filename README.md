@@ -107,6 +107,22 @@ Campos opcionales: `price`, `unit`.
 
 Un stock de cero es válido: significa agotado. La unicidad del nombre está acotada a la sucursal.
 
+### Eliminar producto
+
+`DELETE /products/{productId}`
+
+Sin body.
+
+**Respuestas**
+
+| Código | Cuándo                         |
+|---|--------------------------------|
+| `204` | Producto eliminado; sin body   |
+| `404` | El producto indicado no existe |
+
+Eliminar un producto inexistente devuelve `404` en lugar de `204`: informa al
+cliente de que no había nada que borrar.
+
 ## Modelo de datos
 
 ### `franchise`
