@@ -41,4 +41,11 @@ public class ProductAdapter implements ProductRepository {
     public Mono<Void> deleteById(String id) {
         return repository.deleteById(id);
     }
+
+    @Override
+    public Mono<Product> update(Product product) {
+        ProductEntity entity = ProductMapper.toEntity(product);
+        entity.setUpdatedAt(Instant.now());
+        return template.update(entity).map(ProductMapper::toDomain);
+    }
 }

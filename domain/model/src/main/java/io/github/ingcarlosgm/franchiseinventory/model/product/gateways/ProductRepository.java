@@ -8,4 +8,5 @@ public interface ProductRepository {
     Mono<Boolean> existsByBranchIdAndName(String branchId, String name);
     Mono<Product> findById(String id);
     Mono<Void> deleteById(String id);
+    Mono<Product> update(Product product);
 }
