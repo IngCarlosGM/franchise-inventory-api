@@ -1,30 +1,25 @@
 package io.github.ingcarlosgm.franchiseinventory.config;
 
+import io.github.ingcarlosgm.franchiseinventory.model.franchise.gateways.FranchiseRepository;
+import io.github.ingcarlosgm.franchiseinventory.model.gateways.IdentityGenerator;
+import io.github.ingcarlosgm.franchiseinventory.usecase.createfranchise.CreateFranchiseUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 class UseCasesConfigTest {
 
     @Test
-    void testUseCaseBeansExist() {
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class)) {
-            String[] beanNames = context.getBeanDefinitionNames();
+    void shouldRegisterUseCasesAsBeans() {
+        try (AnnotationConfigApplicationContext context =
+                     new AnnotationConfigApplicationContext(TestConfig.class)) {
 
-            boolean useCaseBeanFound = false;
-            for (String beanName : beanNames) {
-                if (beanName.endsWith("UseCase")) {
-                    useCaseBeanFound = true;
-                    break;
-                }
-            }
-
-            assertTrue(useCaseBeanFound, "No beans ending with 'Use Case' were found");
-        } catch (org.springframework.beans.factory.UnsatisfiedDependencyException e) {
-            assertTrue(true, "Unsatisfied dependencies are expected for UseCases resolving gateways");
+            assertNotNull(context.getBean(CreateFranchiseUseCase.class));
         }
     }
 
@@ -33,14 +28,13 @@ class UseCasesConfigTest {
     static class TestConfig {
 
         @Bean
-        public MyUseCase myUseCase() {
-            return new MyUseCase();
+        public FranchiseRepository franchiseRepository() {
+            return mock(FranchiseRepository.class);
         }
-    }
 
-    static class MyUseCase {
-        public String execute() {
-            return "MyUseCase Test";
+        @Bean
+        public IdentityGenerator identityGenerator() {
+            return mock(IdentityGenerator.class);
         }
     }
 }
