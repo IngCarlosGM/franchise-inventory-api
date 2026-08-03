@@ -17,6 +17,8 @@ import io.github.ingcarlosgm.franchiseinventory.model.product.gateways.ProductRe
 import io.github.ingcarlosgm.franchiseinventory.usecase.addproduct.AddProductUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.removeproduct.RemoveProductUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.updateproductstock.UpdateProductStockUseCase;
+import io.github.ingcarlosgm.franchiseinventory.model.branchtopproduct.gateways.BranchTopProductRepository;
+import io.github.ingcarlosgm.franchiseinventory.usecase.gettopproductsbyfranchise.GetTopProductsByFranchiseUseCase;
 
 class UseCasesConfigTest {
 
@@ -31,6 +33,7 @@ class UseCasesConfigTest {
             assertNotNull(context.getBean(AddProductUseCase.class));
             assertNotNull(context.getBean(RemoveProductUseCase.class));
             assertNotNull(context.getBean(UpdateProductStockUseCase.class));
+            assertNotNull(context.getBean(GetTopProductsByFranchiseUseCase.class));
         }
     }
 
@@ -55,5 +58,8 @@ class UseCasesConfigTest {
 
         @Bean
         public ProductRepository productRepository() { return mock(ProductRepository.class); }
+
+        @Bean
+        public BranchTopProductRepository branchTopProductRepository() { return mock(BranchTopProductRepository.class); }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.ingcarlosgm.franchiseinventory.api.franchise;
 
 import io.github.ingcarlosgm.franchiseinventory.model.franchise.Franchise;
+import io.github.ingcarlosgm.franchiseinventory.model.branchtopproduct.BranchTopProduct;
 
 public final class FranchiseApiMapper {
 
@@ -23,6 +24,16 @@ public final class FranchiseApiMapper {
                 .website(franchise.getWebsite())
                 .createdAt(franchise.getCreatedAt())
                 .updatedAt(franchise.getUpdatedAt())
+                .build();
+    }
+
+    public static BranchTopProductResponse toResponse(BranchTopProduct topProduct) {
+        return BranchTopProductResponse.builder()
+                .branchId(topProduct.getBranchId())
+                .branchName(topProduct.getBranchName())
+                .productId(topProduct.getProductId())
+                .productName(topProduct.getProductName())
+                .stock(topProduct.getStock())
                 .build();
     }
 }
