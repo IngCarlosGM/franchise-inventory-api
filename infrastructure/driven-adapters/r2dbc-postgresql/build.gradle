@@ -11,7 +11,6 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.testcontainers:r2dbc'
     testImplementation 'org.postgresql:r2dbc-postgresql'
-    testImplementation 'org.reactivecommons.utils:object-mapper:0.1.0'
 }
 
 configurations.testImplementation {
