@@ -142,6 +142,30 @@ cliente de que no había nada que borrar.
 El valor recibido **reemplaza** el stock, no lo incrementa. La operación es
 idempotente: aplicar la misma petición dos veces deja el mismo estado.
 
+### Productos con más stock por sucursal
+
+`GET /franchises/{franchiseId}/top-products`
+
+Sin body.
+
+**Respuesta**
+
+```json
+[
+  { "branchId": "…", "branchName": "Centro",
+    "productId": "…", "productName": "Café", "stock": 40 }
+]
+```
+
+| Código | Cuándo |
+|---|---|
+| `200` | Un elemento por sucursal; lista vacía si no hay resultados |
+| `404` | La franquicia indicada no existe |
+
+Los empates se devuelven todos: si dos productos comparten el stock máximo de una
+sucursal, ambos aparecen. Las sucursales sin productos se omiten. Una franquicia
+sin resultados devuelve lista vacía con `200`.
+
 ## Modelo de datos
 
 ### `franchise`

@@ -7,6 +7,8 @@ import io.github.ingcarlosgm.franchiseinventory.model.branch.Branch;
 import io.github.ingcarlosgm.franchiseinventory.model.exception.DuplicateNameException;
 import io.github.ingcarlosgm.franchiseinventory.model.exception.ResourceNotFoundException;
 import io.github.ingcarlosgm.franchiseinventory.model.franchise.Franchise;
+import io.github.ingcarlosgm.franchiseinventory.model.branchtopproduct.BranchTopProduct;
+import io.github.ingcarlosgm.franchiseinventory.usecase.gettopproductsbyfranchise.GetTopProductsByFranchiseUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.addbranch.AddBranchUseCase;
 import io.github.ingcarlosgm.franchiseinventory.usecase.createfranchise.CreateFranchiseUseCase;
 import io.github.ingcarlosgm.franchiseinventory.api.product.ProductHandler;
@@ -22,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.time.Instant;
 import java.util.Map;
@@ -55,6 +58,9 @@ class RouterRestTest {
 
     @MockitoBean
     private UpdateProductStockUseCase updateProductStockUseCase;
+
+    @MockitoBean
+    private GetTopProductsByFranchiseUseCase getTopProductsByFranchiseUseCase;
 
     @Test
     void shouldCreateFranchise() {
@@ -232,6 +238,53 @@ class RouterRestTest {
         webTestClient.patch()
                 .uri("/products/{productId}", PRODUCT_ID)
                 .bodyValue(Map.of("stock", 42))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.error").isEqualTo("RESOURCE_NOT_FOUND");
+    }
+
+    @Test
+    void shouldReturnTopProductsByBranch() {
+        when(getTopProductsByFranchiseUseCase.getTopProductsByFranchise(FRANCHISE_ID))
+                .thenReturn(Flux.just(
+                        BranchTopProduct.builder()
+                                .branchId(BRANCH_ID).branchName("Centro")
+                                .productId(PRODUCT_ID).productName("Café")
+                                .stock(40)
+                                .build()));
+
+        webTestClient.get()
+                .uri("/franchises/{franchiseId}/top-products", FRANCHISE_ID)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].branchName").isEqualTo("Centro")
+                .jsonPath("$[0].productName").isEqualTo("Café")
+                .jsonPath("$[0].stock").isEqualTo(40);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenFranchiseHasNoResults() {
+        when(getTopProductsByFranchiseUseCase.getTopProductsByFranchise(FRANCHISE_ID))
+                .thenReturn(Flux.empty());
+
+        webTestClient.get()
+                .uri("/franchises/{franchiseId}/top-products", FRANCHISE_ID)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$").isArray()
+                .jsonPath("$.length()").isEqualTo(0);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenQueryingTopProductsOfAFranchiseThatDoesNotExist() {
+        when(getTopProductsByFranchiseUseCase.getTopProductsByFranchise(FRANCHISE_ID))
+                .thenReturn(Flux.error(new ResourceNotFoundException("la franquicia", FRANCHISE_ID)));
+
+        webTestClient.get()
+                .uri("/franchises/{franchiseId}/top-products", FRANCHISE_ID)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()

@@ -12,6 +12,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.RequestPredicates.DELETE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.PATCH;
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 
 @Configuration
 public class RouterRest {
@@ -24,6 +25,7 @@ public class RouterRest {
                 .andRoute(POST("/franchises/{franchiseId}/branches"), branchHandler::addBranch)
                 .andRoute(POST("/branches/{branchId}/products"), productHandler::addProduct)
                 .andRoute(DELETE("/products/{productId}"), productHandler::removeProduct)
-                .andRoute(PATCH("/products/{productId}"), productHandler::updateProductStock);
+                .andRoute(PATCH("/products/{productId}"), productHandler::updateProductStock)
+                .andRoute(GET("/franchises/{franchiseId}/top-products"), franchiseHandler::getTopProducts);
     }
 }
