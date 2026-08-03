@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS branch;
+DROP TABLE IF EXISTS franchise;
